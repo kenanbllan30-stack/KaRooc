@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaRooc Games - منصة الألعاب</title>
+    <title>KaRooc Games - عجلة الحظ اليومية</title>
     <style>
-        body { background-color: #12121c; color: #fff; font-family: Tahoma, sans-serif; margin: 0; padding: 0; }
-        .header { background: linear-gradient(135deg, #4a148c, #7b1fa2); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 10; }
-        .balance-box, .id-box { font-size: 13px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 20px; }
-        .container { padding: 15px; max-width: 600px; margin: auto; }
-        h3 { text-align: center; color: #ffab00; margin-bottom: 20px; }
-        .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .game-card { background: #1e1e2f; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-align: center; padding-bottom: 12px; border: 1px solid #2a2a40; transition: transform 0.2s; }
-        .game-card:hover { transform: translateY(-3px); }
-        .game-card img { width: 100%; height: 110px; object-fit: cover; }
-        .game-title { font-size: 13px; font-weight: bold; margin: 8px 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
-        .game-rtp { font-size: 11px; color: #00e676; margin-bottom: 8px; }
-        .btn-group { display: flex; justify-content: center; gap: 6px; padding: 0 8px; }
-        .btn { padding: 6px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-demo { background: #7c4dff; color: #fff; }
-        .btn-play { background: #ffab00; color: #12121c; }
+        body { background-color: #12121c; color: #fff; font-family: Tahoma, sans-serif; margin: 0; padding: 0; text-align: center; }
+        .header { background: linear-gradient(135deg, #4a148c, #7b1fa2); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .balance-box, .id-box { font-size: 12px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 20px; }
+        .container { padding: 20px; max-width: 500px; margin: auto; }
         
-        /* Modal نافذة اللعبة */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #1a1a2e; }
-        .close-btn { background: #ff5252; color: white; padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .modal iframe { width: 100%; height: calc(100vh - 50px); border: none; }
+        .wheel-section { background: #1e1e2f; border: 2px solid #ffab00; border-radius: 15px; padding: 20px; margin-top: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+        .wheel-container { position: relative; width: 240px; height: 240px; margin: 20px auto; border-radius: 50%; border: 6px solid #ffab00; background: conic-gradient(#ff5252 0deg 90deg, #ffab00 90deg 180deg, #00e676 180deg 270deg, #7c4dff 270deg 360deg); display: flex; align-items: center; justify-content: center; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
+        .wheel-center { width: 65px; height: 65px; background: #12121c; border-radius: 50%; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; }
+        .spin-btn { background: #ffab00; color: #12121c; border: none; padding: 10px 25px; font-weight: bold; border-radius: 25px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(255,171,0,0.4); }
+        .spin-btn:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; }
+        
+        .notice { background: rgba(255, 82, 82, 0.2); border: 1px solid #ff5252; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; color: #ff8a80; }
+        .success-box { background: rgba(0, 230, 118, 0.2); border: 1px solid #00e676; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 15px; color: #69f0ae; display: none; }
     </style>
 </head>
 <body>
@@ -36,96 +28,86 @@
     </div>
 
     <div class="container">
-        <h3>🎰 قسم الألعاب المميزة (20 لعبة) 🎰</h3>
-        <div class="games-grid" id="gamesGrid"></div>
-    </div>
+        <div class="wheel-section">
+            <h2 style="color: #ffab00; margin-top: 0;">🎡 عجلة الحظ اليومية 🎡</h2>
+            <p style="font-size: 12px; color: #ccc;">اربح جوائز كبرى: (استرداد 25% 🌟، إضافة 1000 ل.س 💵، إضافة 5000 ل.س 💰، سحب بدون نسبة 💸)</p>
+            
+            <div class="notice" id="conditionNotice">
+                ⚠️ عذراً، عجلة الحظ متاحة <b>مرة واحدة يومياً</b> وتتطلب إجراء عملية <b>شحن سابقة</b> لتفعيلها!
+            </div>
 
-    <!-- نافذة تشغيل اللعبة -->
-    <div class="modal" id="gameModal">
-        <div class="modal-header">
-            <span id="activeGameTitle" style="font-weight:bold; font-size: 14px;">جاري اللعب...</span>
-            <button class="close-btn" onclick="closeGame()">إغلاق ❌</button>
+            <div class="wheel-container" id="spinWheel">
+                <div class="wheel-center">KaRooc</div>
+            </div>
+
+            <button class="spin-btn" id="spinButton" onclick="spinTheWheel()">أبرم العجلة الآن 🎰</button>
+            
+            <div class="success-box" id="resultBox"></div>
         </div>
-        <iframe id="gameFrame" src=""></iframe>
     </div>
 
     <script>
         let realBalance = 5000;
-        let demoBalance = 1000;
+        let currentRotation = 0;
 
-        // قائمة الـ 20 لعبة مع رموزها الحقيقية لتعمل كل لعبة برابطها
-        const gamesList = [
-            { name: "Gates of Zeus", symbol: "vs20olympgate", rtp: "96.50%", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" },
-            { name: "King Lion", symbol: "vs20safarigold", rtp: "97.10%", img: "https://images.unsplash.com/photo-1534188753412-3e26d1d618d6?w=300" },
-            { name: "Sweet Bonanza", symbol: "vs20fruitsw", rtp: "96.48%", img: "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=300" },
-            { name: "Sugar Rush", symbol: "vs20sugarrush", rtp: "96.52%", img: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=300" },
-            { name: "Book of Dead", symbol: "vswaitz", rtp: "96.21%", img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300" },
-            { name: "Wolf Gold", symbol: "vs25wolfgold", rtp: "96.01%", img: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=300" },
-            { name: "The Dog House", symbol: "vs20doghouse", rtp: "96.51%", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=300" },
-            { name: "Starburst", symbol: "starburst", rtp: "96.09%", img: "https://images.unsplash.com/photo-1538370965046-79c0d6907d47?w=300" },
-            { name: "Gonzo's Quest", symbol: "gonzo", rtp: "95.97%", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300" },
-            { name: "Big Bass Bonanza", symbol: "vs10bbbonanza", rtp: "96.71%", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300" },
-            { name: "Buffalo King", symbol: "vs405buffking", rtp: "96.06%", img: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=300" },
-            { name: "Madame Destiny", symbol: "vs10madame", rtp: "96.56%", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" },
-            { name: "Starlight Princess", symbol: "vs20starlight", rtp: "96.50%", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=300" },
-            { name: "Cleopatra", symbol: "cleopatra", rtp: "95.70%", img: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=300" },
-            { name: "Wild West Gold", symbol: "vs40wildwest", rtp: "96.51%", img: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=300" },
-            { name: "Money Train 3", symbol: "moneytrain3", rtp: "96.10%", img: "https://images.unsplash.com/photo-1515165562839-978bbcfc9926?w=300" },
-            { name: "Fruit Party", symbol: "vs20fruitparty", rtp: "96.50%", img: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=300" },
-            { name: "Egyptian Fortunes", symbol: "vs20egyptian", rtp: "96.50%", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300" },
-            { name: "Dragon Kingdom", symbol: "vs25dragonking", rtp: "96.47%", img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=300" },
-            { name: "Hot Safari", symbol: "vs25hotsafari", rtp: "96.17%", img: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=300" }
-        ];
+        // التحقق من حالة الشحن اليومي (افتراضياً محاكاة للشحن أو مرتبط بالتخزين المحلي)
+        function checkEligibility() {
+            const lastSpinDate = localStorage.getItem('karooc_last_spin');
+            const hasDeposited = localStorage.getItem('karooc_has_deposited') === 'true'; // يتم تفعيلها تلقائياً بعد الشحن
+            const today = new Date().toDateString();
 
-        function renderGames() {
-            const grid = document.getElementById('gamesGrid');
-            grid.innerHTML = "";
-            gamesList.forEach((game) => {
-                grid.innerHTML += `
-                    <div class="game-card">
-                        <img src="${game.img}" alt="${game.name}">
-                        <div class="game-title">${game.name}</div>
-                        <div class="game-rtp">RTP: ${game.rtp} 📊</div>
-                        <div class="btn-group">
-                            <button class="btn btn-demo" onclick="playGame('${game.name}', '${game.symbol}', true)">تجريبي</button>
-                            <button class="btn btn-play" onclick="playGame('${game.name}', '${game.symbol}', false)">العب</button>
-                        </div>
-                    </div>
-                `;
-            });
+            const noticeBox = document.getElementById('conditionNotice');
+            const spinBtn = document.getElementById('spinButton');
+
+            // لتسهيل التجربة الآن جعلناها مفعلة، يمكنك ربطها بحالة الشحن الحقيقية لاحقاً
+            // حالياً نفترض أن اللاعب شحن وتم السماح له
+            localStorage.setItem('karooc_has_deposited', 'true'); 
+
+            if (lastSpinDate === today) {
+                noticeBox.innerHTML = "⏳ لقد قمت بتدوير عجلة الحظ اليوم. تعود مجدداً غداً!";
+                noticeBox.style.color = "#ffab00";
+                spinBtn.disabled = true;
+            }
         }
 
         function updateUI() {
             document.getElementById('userBalance').innerText = realBalance;
         }
 
-        function playGame(gameName, symbol, isDemo) {
-            const modal = document.getElementById('gameModal');
-            const frame = document.getElementById('gameFrame');
-            document.getElementById('activeGameTitle').innerText = `🎮 ${gameName} (${isDemo ? 'تجريبي' : 'حقيقي'})`;
+        function spinTheWheel() {
+            const wheel = document.getElementById('spinWheel');
+            const spinBtn = document.getElementById('spinButton');
+            const resultBox = document.getElementById('resultBox');
             
-            if (isDemo) {
-                alert(`أنت تلعب ${gameName} بوضع التجربة`);
-            } else {
-                if (realBalance <= 0) {
-                    alert('رصيدك الحقيقي غير كافٍ! قم بشحن حسابك أولاً.');
-                    return;
+            spinBtn.disabled = true;
+            const randomDegree = Math.floor(Math.random() * 3600) + 720;
+            currentRotation += randomDegree;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                const prizes = [
+                    { text: '✨ مبروك! ربحت تفعيل نسبة استرداد 25% على شحنتك القادمة!', type: 'percent' },
+                    { text: '💵 مبروك! تمت إضافة 1000 ل.س رصيد مجاني لرصيدك!', type: 'balance', val: 1000 },
+                    { text: '💰 كفو! تمت إضافة 5000 ل.س رصيد مجاني لرصيدك!', type: 'balance', val: 5000 },
+                    { text: '💸 مبروك! ربحت ميزة سحب الأرباح من دون أي نسبة اقتطاع!', type: 'withdraw' }
+                ];
+
+                const won = prizes[Math.floor(Math.random() * prizes.length)];
+
+                if (won.type === 'balance') {
+                    realBalance += won.val;
+                    updateUI();
                 }
-                realBalance -= 50;
-                updateUI();
-            }
 
-            // ربط الرمز الخاص بكل لعبة بالرابط التجريبي
-            frame.src = `https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=${symbol}&jurisdiction=99`;
-            modal.style.display = "flex";
+                resultBox.style.display = 'block';
+                resultBox.innerHTML = `🎉 <b>نتيجة الحظ:</b><br>${won.text}`;
+
+                // حفظ تاريخ التدوير لمنع تكرارها اليوم
+                localStorage.setItem('karooc_last_spin', new Date().toDateString());
+            }, 4000);
         }
 
-        function closeGame() {
-            document.getElementById('gameModal').style.display = "none";
-            document.getElementById('gameFrame').src = "";
-        }
-
-        renderGames();
+        checkEligibility();
         updateUI();
     </script>
 </body>
