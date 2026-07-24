@@ -3,112 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaRooc Games - عجلة الحظ اليومية</title>
+    <title>KaRooc Games - منصة الألعاب الحية</title>
     <style>
         body { background-color: #12121c; color: #fff; font-family: Tahoma, sans-serif; margin: 0; padding: 0; text-align: center; }
         .header { background: linear-gradient(135deg, #4a148c, #7b1fa2); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .balance-box, .id-box { font-size: 12px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 20px; }
         .container { padding: 20px; max-width: 500px; margin: auto; }
-        
-        .wheel-section { background: #1e1e2f; border: 2px solid #ffab00; border-radius: 15px; padding: 20px; margin-top: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        .wheel-container { position: relative; width: 240px; height: 240px; margin: 20px auto; border-radius: 50%; border: 6px solid #ffab00; background: conic-gradient(#ff5252 0deg 90deg, #ffab00 90deg 180deg, #00e676 180deg 270deg, #7c4dff 270deg 360deg); display: flex; align-items: center; justify-content: center; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
-        .wheel-center { width: 65px; height: 65px; background: #12121c; border-radius: 50%; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; }
-        .spin-btn { background: #ffab00; color: #12121c; border: none; padding: 10px 25px; font-weight: bold; border-radius: 25px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(255,171,0,0.4); }
-        .spin-btn:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; }
-        
-        .notice { background: rgba(255, 82, 82, 0.2); border: 1px solid #ff5252; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; color: #ff8a80; }
-        .success-box { background: rgba(0, 230, 118, 0.2); border: 1px solid #00e676; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 15px; color: #69f0ae; display: none; }
+        .game-card { background: #1e1e2f; border: 2px solid #7c4dff; border-radius: 15px; padding: 20px; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+        .play-btn { background: #00e676; color: #12121c; border: none; padding: 12px 25px; font-weight: bold; border-radius: 25px; cursor: pointer; font-size: 15px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,230,118,0.4); }
     </style>
 </head>
 <body>
-
     <div class="header">
         <div class="balance-box">💰 الرصيد: <span id="userBalance">5000</span> ل.س</div>
         <div class="id-box">🎮 ID: <span id="userId">7956980808</span></div>
     </div>
-
     <div class="container">
-        <div class="wheel-section">
-            <h2 style="color: #ffab00; margin-top: 0;">🎡 عجلة الحظ اليومية 🎡</h2>
-            <p style="font-size: 12px; color: #ccc;">اربح جوائز كبرى: (استرداد 25% 🌟، إضافة 1000 ل.س 💵، إضافة 5000 ل.س 💰، سحب بدون نسبة 💸)</p>
-            
-            <div class="notice" id="conditionNotice">
-                ⚠️ عذراً، عجلة الحظ متاحة <b>مرة واحدة يومياً</b> وتتطلب إجراء عملية <b>شحن سابقة</b> لتفعيلها!
-            </div>
-
-            <div class="wheel-container" id="spinWheel">
-                <div class="wheel-center">KaRooc</div>
-            </div>
-
-            <button class="spin-btn" id="spinButton" onclick="spinTheWheel()">أبرم العجلة الآن 🎰</button>
-            
-            <div class="success-box" id="resultBox"></div>
+        <div class="game-card">
+            <h2 style="color: #7c4dff; margin-top: 0;">🎮 ألعاب KaRooc الحية</h2>
+            <p style="font-size: 13px; color: #ccc;">اختر لعبتك المفضلة، استمتع بالمنافسة، وضاعف رصيدك الحقيقي الآن!</p>
+            <button class="play-btn" onclick="alert('جارٍ بدء اللعبة... بالتوفيق!')">🚀 العب الآن برصيدك</button>
         </div>
     </div>
-
-    <script>
-        let realBalance = 5000;
-        let currentRotation = 0;
-
-        // التحقق من حالة الشحن اليومي (افتراضياً محاكاة للشحن أو مرتبط بالتخزين المحلي)
-        function checkEligibility() {
-            const lastSpinDate = localStorage.getItem('karooc_last_spin');
-            const hasDeposited = localStorage.getItem('karooc_has_deposited') === 'true'; // يتم تفعيلها تلقائياً بعد الشحن
-            const today = new Date().toDateString();
-
-            const noticeBox = document.getElementById('conditionNotice');
-            const spinBtn = document.getElementById('spinButton');
-
-            // لتسهيل التجربة الآن جعلناها مفعلة، يمكنك ربطها بحالة الشحن الحقيقية لاحقاً
-            // حالياً نفترض أن اللاعب شحن وتم السماح له
-            localStorage.setItem('karooc_has_deposited', 'true'); 
-
-            if (lastSpinDate === today) {
-                noticeBox.innerHTML = "⏳ لقد قمت بتدوير عجلة الحظ اليوم. تعود مجدداً غداً!";
-                noticeBox.style.color = "#ffab00";
-                spinBtn.disabled = true;
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('userBalance').innerText = realBalance;
-        }
-
-        function spinTheWheel() {
-            const wheel = document.getElementById('spinWheel');
-            const spinBtn = document.getElementById('spinButton');
-            const resultBox = document.getElementById('resultBox');
-            
-            spinBtn.disabled = true;
-            const randomDegree = Math.floor(Math.random() * 3600) + 720;
-            currentRotation += randomDegree;
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-            setTimeout(() => {
-                const prizes = [
-                    { text: '✨ مبروك! ربحت تفعيل نسبة استرداد 25% على شحنتك القادمة!', type: 'percent' },
-                    { text: '💵 مبروك! تمت إضافة 1000 ل.س رصيد مجاني لرصيدك!', type: 'balance', val: 1000 },
-                    { text: '💰 كفو! تمت إضافة 5000 ل.س رصيد مجاني لرصيدك!', type: 'balance', val: 5000 },
-                    { text: '💸 مبروك! ربحت ميزة سحب الأرباح من دون أي نسبة اقتطاع!', type: 'withdraw' }
-                ];
-
-                const won = prizes[Math.floor(Math.random() * prizes.length)];
-
-                if (won.type === 'balance') {
-                    realBalance += won.val;
-                    updateUI();
-                }
-
-                resultBox.style.display = 'block';
-                resultBox.innerHTML = `🎉 <b>نتيجة الحظ:</b><br>${won.text}`;
-
-                // حفظ تاريخ التدوير لمنع تكرارها اليوم
-                localStorage.setItem('karooc_last_spin', new Date().toDateString());
-            }, 4000);
-        }
-
-        checkEligibility();
-        updateUI();
-    </script>
 </body>
 </html>
