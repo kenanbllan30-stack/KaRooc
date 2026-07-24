@@ -1,0 +1,15 @@
+  else if (text === '🎡 عجلة الحظ 🎡') {
+    bot.sendMessage(chatId, `🎡 **عجلة الحظ الكبرى!** 🎡\n\nاختبر حظك الآن واربح جوائز فورية وقيمة (تتاح مرة واحدة يومياً بعد الشحن):`, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: '🎯 افتح عجلة الحظ الآن',
+              web_app: { url: WEBSITE_URL + '/wheel.html' }
+            }
+          ]
+        ]
+      }
+    });
+  }
+  
