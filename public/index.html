@@ -3,27 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaRooc Games - منصة الألعاب الحية</title>
+    <title>KaRooc Games - منصة الألعاب</title>
     <style>
-        body { background-color: #12121c; color: #fff; font-family: Tahoma, sans-serif; margin: 0; padding: 0; text-align: center; }
-        .header { background: linear-gradient(135deg, #4a148c, #7b1fa2); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .balance-box, .id-box { font-size: 12px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 20px; }
-        .container { padding: 20px; max-width: 500px; margin: auto; }
-        .game-card { background: #1e1e2f; border: 2px solid #7c4dff; border-radius: 15px; padding: 20px; margin-top: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        .play-btn { background: #00e676; color: #12121c; border: none; padding: 12px 25px; font-weight: bold; border-radius: 25px; cursor: pointer; font-size: 15px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,230,118,0.4); }
+        body { background-color: #12121c; color: #fff; font-family: Tahoma, sans-serif; margin: 0; padding: 0; }
+        .header { background: linear-gradient(135deg, #4a148c, #7b1fa2); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 10; }
+        .balance-box, .id-box { font-size: 13px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 20px; }
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+        h3 { text-align: center; color: #ffab00; margin-bottom: 20px; }
+        .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .game-card { background: #1e1e2f; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-align: center; padding-bottom: 12px; border: 1px solid #2a2a40; transition: transform 0.2s; }
+        .game-card:hover { transform: translateY(-3px); }
+        .game-card img { width: 100%; height: 110px; object-fit: cover; }
+        .game-title { font-size: 13px; font-weight: bold; margin: 8px 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
+        .game-rtp { font-size: 11px; color: #00e676; margin-bottom: 8px; }
+        .btn-group { display: flex; justify-content: center; gap: 6px; padding: 0 8px; }
+        .btn { padding: 6px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .btn-demo { background: #7c4dff; color: #fff; }
+        .btn-play { background: #ffab00; color: #12121c; }
+        
+        /* Modal نافذة اللعبة */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #1a1a2e; }
+        .close-btn { background: #ff5252; color: white; padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .modal iframe { width: 100%; height: calc(100vh - 50px); border: none; }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <div class="balance-box">💰 الرصيد: <span id="userBalance">5000</span> ل.س</div>
+        <div class="balance-box">💰 الرصيد الحقيقي: <span id="userBalance">5000</span> ل.س</div>
         <div class="id-box">🎮 ID: <span id="userId">7956980808</span></div>
     </div>
+
     <div class="container">
-        <div class="game-card">
-            <h2 style="color: #7c4dff; margin-top: 0;">🎮 ألعاب KaRooc الحية</h2>
-            <p style="font-size: 13px; color: #ccc;">اختر لعبتك المفضلة، استمتع بالمنافسة، وضاعف رصيدك الحقيقي الآن!</p>
-            <button class="play-btn" onclick="alert('جارٍ بدء اللعبة... بالتوفيق!')">🚀 العب الآن برصيدك</button>
-        </div>
+        <h3>🎰 منصة ألعاب KaRooc 🎰</h3>
+        <div class="games-grid" id="gamesGrid"></div>
     </div>
+
+    <!-- نافذة تشغيل اللعبة -->
+    <div class="modal" id="gameModal">
+        <div class="modal-header">
+            <span id="activeGameTitle" style="font-weight:bold; font-size: 14px;">جاري اللعب...</span>
+            <button class="close-btn" onclick="closeGame()">إغلاق ❌</button>
+        </div>
+        <iframe id="gameFrame" src=""></iframe>
+    </div>
+
+    <script>
+        let realBalance = 5000;
+
+        const gamesList = [
+            { name: "Gates of Zeus", symbol: "vs20olympgate", rtp: "96.50%", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" },
+            { name: "King Lion", symbol: "vs20safarigold", rtp: "97.10%", img: "https://images.unsplash.com/photo-1534188753412-3e26d1d618d6?w=300" },
+            { name: "Sweet Bonanza", symbol: "vs20fruitsw", rtp: "96.48%", img: "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=300" },
+            { name: "Sugar Rush", symbol: "vs20sugarrush", rtp: "96.52%", img: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=300" },
+            { name: "Book of Dead", symbol: "vswaitz", rtp: "96.21%", img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300" },
+            { name: "Wolf Gold", symbol: "vs25wolfgold", rtp: "96.01%", img: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=300" },
+            { name: "The Dog House", symbol: "vs20doghouse", rtp: "96.51%", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=300" },
+            { name: "Starburst", symbol: "starburst", rtp: "96.09%", img: "https://images.unsplash.com/photo-1538370965046-79c0d6907d47?w=300" },
+            { name: "Gonzo's Quest", symbol: "gonzo", rtp: "95.97%", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300" },
+            { name: "Big Bass Bonanza", symbol: "vs10bbbonanza", rtp: "96.71%", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300" },
+            { name: "Buffalo King", symbol: "vs405buffking", rtp: "96.06%", img: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=300" },
+            { name: "Madame Destiny", symbol: "vs10madame", rtp: "96.56%", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" },
+            { name: "Starlight Princess", symbol: "vs20starlight", rtp: "96.50%", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=300" },
+            { name: "Cleopatra", symbol: "cleopatra", rtp: "95.70%", img: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=300" },
+            { name: "Wild West Gold", symbol: "vs40wildwest", rtp: "96.51%", img: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=300" },
+            { name: "Money Train 3", symbol: "moneytrain3", rtp: "96.10%", img: "https://images.unsplash.com/photo-1515165562839-978bbcfc9926?w=300" },
+            { name: "Fruit Party", symbol: "vs20fruitparty", rtp: "96.50%", img: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=300" },
+            { name: "Egyptian Fortunes", symbol: "vs20egyptian", rtp: "96.50%", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300" },
+            { name: "Dragon Kingdom", symbol: "vs25dragonking", rtp: "96.47%", img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=300" },
+            { name: "Hot Safari", symbol: "vs25hotsafari", rtp: "96.17%", img: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=300" }
+        ];
+
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = "";
+            gamesList.forEach((game) => {
+                grid.innerHTML += `
+                    <div class="game-card">
+                        <img src="${game.img}" alt="${game.name}">
+                        <div class="game-title">${game.name}</div>
+                        <div class="game-rtp">RTP: ${game.rtp} 📊</div>
+                        <div class="btn-group">
+                            <button class="btn btn-demo" onclick="playGame('${game.name}', '${game.symbol}', true)">تجريبي</button>
+                            <button class="btn btn-play" onclick="playGame('${game.name}', '${game.symbol}', false)">العب (حقيقي)</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('userBalance').innerText = realBalance;
+        }
+
+        function playGame(gameName, symbol, isDemo) {
+            const modal = document.getElementById('gameModal');
+            const frame = document.getElementById('gameFrame');
+            
+            if (isDemo) {
+                document.getElementById('activeGameTitle').innerText = `🎮 ${gameName} [وضع التجربة المجاني]`;
+                alert(`أنت تلعب ${gameName} بالرصيد التجريبي المجاني`);
+            } else {
+                if (realBalance < 100) {
+                    alert('⚠️ رصيدك الحقيقي غير كافٍ! يرجى شحن حسابك عبر البوت.');
+                    return;
+                }
+                realBalance -= 100; // خصم تكلفة الدورة من الرصيد الحقيقي
+                updateUI();
+                document.getElementById('activeGameTitle').innerText = `🎮 ${gameName} [الرصيد الحقيقي - تم خصم 100 ل.س]`;
+            }
+
+            frame.src = `https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=${symbol}&jurisdiction=99`;
+            modal.style.display = "flex";
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').style.display = "none";
+            document.getElementById('gameFrame').src = "";
+        }
+
+        renderGames();
+        updateUI();
+    </script>
 </body>
 </html>
